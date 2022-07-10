@@ -94,6 +94,18 @@ FRESULT fontFolder(char* path) {
 
 
 /*
+ * プレビューによりボタンが消えてしまうことがあるため
+ */
+void drawButton() {
+    uint8_t jj;
+
+    //ボタン描画
+    for (jj = BtnOKObj; jj <= BtnCancelObj; jj++) {
+        DrawButton(CurrentForm[jj], CurrentForm[jj].color, TextbgColor, CurrentForm[jj].color, 10);
+    }
+}
+
+/*
  * SDカード内のフォントリストを表示する
  */
 void drawFontSelection() {
@@ -113,9 +125,7 @@ void drawFontSelection() {
     display_drawChars(CurrentForm[jj].x, CurrentForm[jj].y, str, CurrentForm[jj].color, TextbgColor, CurrentForm[jj].fontmag);
 
     //ボタン描画
-    for (jj = BtnOKObj; jj <= BtnCancelObj; jj++) {
-        DrawButton(CurrentForm[jj], CurrentForm[jj].color, TextbgColor, CurrentForm[jj].color, 10);
-    }
+    drawButton();
 
     //枠を描画
     display_drawRoundRect(CurrentForm[BtnObj].x-3, CurrentForm[BtnObj].y-3, CurrentForm[BtnObj].xw, CurrentForm[BtnObj].yw, 0, GREY);
@@ -221,6 +231,9 @@ void TouchProcedureFontSelect() {
         SetFont(newfont);
         //選択したフォントをプレビュー
         PreviewFont(10, FontTableY+FolderH*8+5, FontMagx11, 0, WHITE);
+        SetFont(FontNormal);  //
+        drawButton();   //プレビューでボタンが消えることがあるため
+        SetFont(newfont);
         
     } else if (ButtonPush(TouchX, TouchY, &CurrentForm[BtnCancelObj])) {
         ClearBuffer();

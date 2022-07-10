@@ -62,6 +62,7 @@ extern "C" {
 #define FdegF   0x1Eu
 #define Ffbox   0x1Fu    //Filled Box
 #define Fbox    0x7Fu    //Box
+#define Fbell   0x60u   //アラームアイコン
     
 //配列内の位置
 #define Fxsize  0u  //X方向のドット数

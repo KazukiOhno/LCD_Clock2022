@@ -149,6 +149,8 @@ enum AnalogClockFormat {
 enum AlarmFormat {
     ALMAMPM,  //AM/PM表記
     ALM24,    //24時間表記
+    iALAMPM,  //AM/PM表記　アイコン
+    iAL24,    //24時間表記　アイコン
     MAXAlarmFormat, //要素数
 };
 
@@ -166,6 +168,11 @@ enum CalendarFormat {
     Month2v,
     Month3,
     Month3v,
+    Month1e,
+    Month2e,
+    Month2ve,
+    Month3e,
+    Month3ve,
     MAXCalendarFormat,  //要素数
 };
 

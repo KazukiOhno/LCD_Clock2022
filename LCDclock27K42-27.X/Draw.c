@@ -1024,18 +1024,15 @@ void basicDrawCalendar(uint8_t year, uint8_t month, int16_t xs, int16_t ys, Obje
 void DrawCalendar(ObjectRsc *rsc) {
     uint8_t jj;
 
-#ifdef ENGLISH
-    CalendarEJ = 1;
-#else
-    CalendarEJ = 0;
-#endif
+    if (rsc->format >= Month1e) CalendarEJ = 1;
+    else CalendarEJ = 0;
     if (rsc->disp) {
-        if (rsc->format == Month1) {
+        if (rsc->format == Month1 + CalendarEJ*(Month1e - Month1)) {
             // 1か月のカレンダーを表示　　大きさはフォントサイズで指定
             basicDrawCalendar(Bcd2Hex(DateTime[6]), Bcd2Hex(DateTime[5]), rsc->x, rsc->y, rsc);
             CustomXsize = CalendarXsize;
             CustomYsize = CalendarYsize;
-        } else if (rsc->format == Month3) {
+        } else if (rsc->format == Month3 + CalendarEJ*(Month3e - Month3)) {
             // 3か月分のカレンダーを表示
             //3か月カレンダのX,Y座標は、リソースから取得
             //CalendarXsizeは、最初の月を描画すると計算される
@@ -1044,7 +1041,7 @@ void DrawCalendar(ObjectRsc *rsc) {
             }
             CustomXsize = CalendarXsize *3;
             CustomYsize = CalendarYsize;
-        } else if (rsc->format == Month3v) {
+        } else if (rsc->format == Month3v + CalendarEJ*(Month3ve - Month3v)) {
             // 3か月分のカレンダーを縦に表示
             //縦表示の時は、2か月分しか表示しない→表示が欠けても良しとする
             //CalendarYsizeは、最初の月を描画すると計算される
@@ -1053,14 +1050,14 @@ void DrawCalendar(ObjectRsc *rsc) {
             }
             CustomXsize = CalendarXsize;
             CustomYsize = CalendarYsize *3;
-        } else if (rsc->format == Month2) {
+        } else if (rsc->format == Month2 + CalendarEJ*(Month2e - Month2)) {
             // 2か月分のカレンダーを表示
             for (jj=0; jj<2; jj++) {
                 basicDrawCalendar(Bcd2Hex(DateTime[6]), Bcd2Hex(DateTime[5])+jj, rsc->x +CalendarXsize*jj, rsc->y, rsc);
             }
             CustomXsize = CalendarXsize *2;
             CustomYsize = CalendarYsize;
-        } else if (rsc->format == Month2v) {
+        } else if (rsc->format == Month2v + CalendarEJ*(Month2ve - Month2v)) {
             // 2か月分のカレンダーを縦に表示
             for (jj=0; jj<2; jj++) {
                 basicDrawCalendar(Bcd2Hex(DateTime[6]), Bcd2Hex(DateTime[5])+jj, rsc->x, rsc->y + CalendarYsize*jj, rsc);
@@ -1077,12 +1074,19 @@ void DrawCalendar(ObjectRsc *rsc) {
  */
 void DrawAlarmTime(uint8_t *alarmtime, uint8_t sw, ObjectRsc *rsc) {
     char str[100];
-    char ampm[][3] = {"AM", "PM"};
+    char ampm[][4] = {"AM ", "PM ", ""};
     uint8_t ap;
     char onOff; //[] = {'-', '+'};    //オンオフで+-切替　plus/minus
     uint16_t color;
     uint8_t hr;
+    char alarm[5];
     
+    if (rsc->format >= iALAMPM) {
+        sprintf(alarm, "%c", Fbell);
+    } else {
+        strcpy(alarm, "ALM");   
+    }
+
     if (rsc->disp) {
         //アラーム時刻の表示色を、スライドSWのOn/Offで変える
         if (sw == SlideSWon) {
@@ -1095,21 +1099,25 @@ void DrawAlarmTime(uint8_t *alarmtime, uint8_t sw, ObjectRsc *rsc) {
             color = rsc->attribute;  //アラームのオフ時の色はattributeに格納
         }
         
-        if (rsc->format == ALMAMPM) {
+        hr = Bcd2Hex(alarmtime[1]);
+        if ((rsc->format == ALMAMPM)||(rsc->format == iALAMPM)) {
             //12時間表示
-            hr = Bcd2Hex(alarmtime[1]);
-            if (alarmtime[1] >= 0x12) {
+            if (hr >= 12) {
                 ap= 1 ;   //BCDで12時以降なら午後  
                 hr -= 12;   //12時間表記のため、12差し引く
             }
             else {
                 ap = 0;
             }
-            sprintf(str, "ALM%c %s %02d:%02x", onOff, ampm[ap], hr, alarmtime[0]);
         } else {
-            //24時間表示
-            sprintf(str, "ALM%c %02x:%02x", onOff, alarmtime[1], alarmtime[0]);
+            ap = 2;
         }
+        
+        sprintf(str, "%s%c %s%02d:%02x", alarm, onOff, ampm[ap], hr, alarmtime[0]);
+//        } else {
+//            //24時間表示
+//            sprintf(str, "ALM%c %02x:%02x", onOff, alarmtime[1], alarmtime[0]);
+//        }
         
         presetting(rsc);
         display_setColor(color);    //SWに対応して色を変更させるため

@@ -250,8 +250,10 @@ const char *AnalogClockSizeText[] = {
 
 //アラーム表示の形式　AlarmFormatと順序同一
 const char *AlarmFormatText[] = {
-    "12h ALM AM/PM",
-    "24h ALM",
+    "1:12h ALM",
+    "2:24h ALM",
+    "3:12h ` ",
+    "4:24h ` ",
 };
 
 //温度の表示形式　TempFormatと順序同一
@@ -267,6 +269,11 @@ const char *CalendarFormatText[] = {
     "2v month", //縦並び
     "3month",
     "3v month",
+    "1month(E)",    //曜日の英語表示
+    "2month(E)",   //横並び
+    "2v month(E)", //縦並び
+    "3month(E)",
+    "3v month(E)",
 };
 
 
@@ -630,7 +637,8 @@ void TouchProcedurePopup() {
                 TempObjData[TargetObj].xpitchAdj = (int8_t) select-2;  //0番目はdefault-2
             } else if (TargetItem == ItemFormat) {         //フォーマット
                 TempObjData[TargetObj].format = select;
-                if (TempObjData[TargetObj].format == ANALOGCLOCK) {
+                
+                if ((TargetObj == TimeObj)&&(TempObjData[TargetObj].format == ANALOGCLOCK)) {
                     //アナログ時計に変更した時、初期化として、Large=0最大サイズを指定
                     TempObjData[TargetObj].xw = AnalogClockSize[Large] *2;
                     TempObjData[TargetObj].yw = TempObjData[TargetObj].xw;
